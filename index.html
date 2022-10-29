@@ -11,38 +11,38 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="icon"><i class="fa-solid fa-clock fa-3x"></i></div>
+  <div class="container">
+    <div class="icon"><i class="fa-solid fa-clock fa-3x"></i></div>
 
-        <h1>Создать новый таймер обратного отсчета</h1>
+    <h1>Создать новый таймер обратного отсчета</h1>
 
-        <div class="input">
-            <label for="">Заголовок для таймера</label>
-            <input type="text" id="title-date" placeholder="Заголовок">
+    <div class="input">
+      <label for="">Заголовок для таймера</label>
+      <input type="text" id="title-date" placeholder="Заголовок">
 
-            
-            <label for="">Дата для отсчета</label>
-            <input type="date" id="date" name="date" placeholder="06/06/2023"/>
-        </div>
-        <button class="btn" id="btn">Начать</button>
 
-        <div class="output hide">
-            <div class="time-labels">
-                <p>Days</p>
-                <p>Hours</p>
-                <p>Mins</p>
-                <p>Secs</p>
-            </div>
-            <div id="output">
-                <div class="numbers">0:0:0:0</div>
-            </div>
-        </div>
-        
-        <h2 class="complete hide"></h2>
-        <button class="btn btn-reset hide" id="btn-reset">Сбросить</button>
+      <label for="">Дата для отсчета</label>
+      <input type="date" id="date" name="date" placeholder="06/06/2023"/>
     </div>
+    <button class="btn" id="btn">Начать</button>
 
-    <script src="index.js"></script>
+      <div class="output hide">
+        <div class="time-labels">
+          <p>Days</p>
+          <p>Hours</p>
+          <p>Mins</p>
+          <p>Secs</p>
+        </div>
+          <div id="output">
+            <div class="numbers">0:0:0:0</div>
+          </div>
+      </div>
+
+      <h2 class="complete hide"></h2>
+      <button class="btn btn-reset hide" id="btn-reset">Сбросить</button>
+  </div>
+
+  <script src="index.js"></script>
 </body>
 
 </html>
