@@ -51,7 +51,6 @@ const startTimer = () => {
   toggleHide();
 
   resetBtn.addEventListener('click', reserTimer, { once: true });
-  // startBtn.removeEventListener('click', startTimer);
 
   title.textContent = timerHeader.value;
   endDate = userDate.value;
@@ -60,8 +59,6 @@ const startTimer = () => {
 
 const reserTimer = () => {
   toggleHide();
-
-  startBtn.addEventListener('click', startTimer);
 
   title.textContent = 'Создать новый таймер обратного отсчета';
   timerHeader.value = '';
