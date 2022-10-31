@@ -23,12 +23,20 @@ const title = document.querySelector('h1');
 const inputBlock = document.querySelector('.input');
 const outputBlock = document.querySelector('.output');
 
-const timerHader = document.querySelector('#title-date');
+const timerHeader = document.querySelector('#title-date');
 const userDate = document.querySelector('#date');
 let endDate = null;
 
-const startTimer = (e) => {
-  if (timerHader.value === '') {
+const toggleHide = () => {
+  inputBlock.classList.toggle('hide');
+  outputBlock.classList.toggle('hide');
+
+  startBtn.classList.toggle('hide');
+  resetBtn.classList.toggle('hide');
+}
+
+const startTimer = () => {
+  if (timerHeader.value === '') {
     alert('Введите заголовок');
 
     return;
@@ -40,31 +48,23 @@ const startTimer = (e) => {
     return;
   }
 
-  inputBlock.classList.toggle('hide');
-  outputBlock.classList.toggle('hide');
-
-  startBtn.classList.toggle('hide');
-  resetBtn.classList.toggle('hide');
+  toggleHide();
 
   resetBtn.addEventListener('click', reserTimer, { once: true });
-  startBtn.removeEventListener('click', startTimer);
+  // startBtn.removeEventListener('click', startTimer);
 
-  title.innerText = timerHader.value;
+  title.textContent = timerHeader.value;
   endDate = userDate.value;
-  console.log("🚀 ~ file: index.js ~ line 54 ~ startTimer ~ endDate", endDate)
+
 }
 
-const reserTimer = (e) => {
-  inputBlock.classList.toggle('hide');
-  outputBlock.classList.toggle('hide');
-
-  startBtn.classList.toggle('hide');
-  resetBtn.classList.toggle('hide');
+const reserTimer = () => {
+  toggleHide();
 
   startBtn.addEventListener('click', startTimer);
 
-  title.innerText = 'Создать новый таймер обратного отсчета';
-  timerHader.value = '';
+  title.textContent = 'Создать новый таймер обратного отсчета';
+  timerHeader.value = '';
   userDate.value = '';
 }
 
