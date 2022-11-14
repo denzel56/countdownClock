@@ -30,8 +30,6 @@ const numbers = document.querySelector('.numbers');
 let targetDate = null;
 let intervalId = null;
 
-const today = new Date();
-
 const toggleHide = () => {
   inputBlock.classList.toggle('hide');
   outputBlock.classList.toggle('hide');
@@ -46,21 +44,25 @@ const addZero = (num) => {
 
 const countdown = () => {
   const deadline = new Date(targetDate.split('-'));
-  const day = new Date();
 
-  if (deadline - day === 0) {
+  const today = new Date();
+
+  if (deadline - today <= 0) {
     clearInterval(intervalId);
+
+    numbers.textContent = '0:0:0:0';
   }
 
-  const days = addZero(parseInt((deadline - day) / (1000 * 60 * 60 * 24)));
-  const hours = addZero(parseInt(((deadline - day) / (1000 * 60 * 60)) % 24));
-  const minutes = addZero(parseInt(((deadline - day) / (1000 * 60)) % 60));
-  const seconds = addZero(parseInt(((deadline - day) / 1000) % 60));
+  const days = addZero(parseInt((deadline - today) / (1000 * 60 * 60 * 24)));
+  const hours = addZero(parseInt(((deadline - today) / (1000 * 60 * 60)) % 24));
+  const minutes = addZero(parseInt(((deadline - today) / (1000 * 60)) % 60));
+  const seconds = addZero(parseInt(((deadline - today) / 1000) % 60));
 
   numbers.textContent = `${days}:${hours}:${minutes}:${seconds}`;
 }
 
 const startTimer = () => {
+
   if (timerHeader.value === '') {
     alert('Введите заголовок');
 
@@ -75,7 +77,7 @@ const startTimer = () => {
 
   const deadline = new Date(userDate.value.split('-'));
 
-  if (deadline < today) {
+  if (deadline < new Date()) {
     alert('Укажите дату больше, чем сегодня');
 
     return;
