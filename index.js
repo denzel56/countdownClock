@@ -25,7 +25,10 @@ const outputBlock = document.querySelector('.output');
 
 const timerHeader = document.querySelector('#title-date');
 const userDate = document.querySelector('#date');
-let endDate = null;
+const numbers = document.querySelector('.numbers');
+
+let targetDate = null;
+let intervalId = null;
 
 const toggleHide = () => {
   inputBlock.classList.toggle('hide');
@@ -35,7 +38,31 @@ const toggleHide = () => {
   resetBtn.classList.toggle('hide');
 }
 
+const addZero = (num) => {
+  return num < 10 && num > 0 ? `0${num}` : num;
+}
+
+const countdown = () => {
+  const deadline = new Date(targetDate.split('-'));
+
+  const today = new Date();
+
+  if (deadline - today <= 0) {
+    clearInterval(intervalId);
+
+    numbers.textContent = '0:0:0:0';
+  }
+
+  const days = addZero(parseInt((deadline - today) / (1000 * 60 * 60 * 24)));
+  const hours = addZero(parseInt(((deadline - today) / (1000 * 60 * 60)) % 24));
+  const minutes = addZero(parseInt(((deadline - today) / (1000 * 60)) % 60));
+  const seconds = addZero(parseInt(((deadline - today) / 1000) % 60));
+
+  numbers.textContent = `${days}:${hours}:${minutes}:${seconds}`;
+}
+
 const startTimer = () => {
+
   if (timerHeader.value === '') {
     alert('Введите заголовок');
 
@@ -48,16 +75,28 @@ const startTimer = () => {
     return;
   }
 
+  const deadline = new Date(userDate.value.split('-'));
+
+  if (deadline < new Date()) {
+    alert('Укажите дату больше, чем сегодня');
+
+    return;
+  }
+
   toggleHide();
 
   resetBtn.addEventListener('click', reserTimer, { once: true });
 
   title.textContent = timerHeader.value;
-  endDate = userDate.value;
+  targetDate = userDate.value;
 
+  countdown();
+
+  intervalId = setInterval(countdown, 1000);
 }
 
 const reserTimer = () => {
+  clearInterval(intervalId);
   toggleHide();
 
   title.textContent = 'Создать новый таймер обратного отсчета';
