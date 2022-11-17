@@ -44,21 +44,36 @@ const addZero = (num) => {
 
 const countdown = () => {
   const deadline = new Date(targetDate.split('-'));
-
   const today = new Date();
+  const diff = deadline - today;
 
-  if (deadline - today <= 0) {
+  if (diff <= 0) {
     clearInterval(intervalId);
 
     numbers.textContent = '0:0:0:0';
   }
 
-  const days = addZero(parseInt((deadline - today) / (1000 * 60 * 60 * 24)));
-  const hours = addZero(parseInt(((deadline - today) / (1000 * 60 * 60)) % 24));
-  const minutes = addZero(parseInt(((deadline - today) / (1000 * 60)) % 60));
-  const seconds = addZero(parseInt(((deadline - today) / 1000) % 60));
+  const days = addZero(parseInt(diff / (1000 * 60 * 60 * 24)));
+  const hours = addZero(parseInt((diff / (1000 * 60 * 60)) % 24));
+  const minutes = addZero(parseInt((diff / (1000 * 60)) % 60));
+  const seconds = addZero(parseInt((diff / 1000) % 60));
 
   numbers.textContent = `${days}:${hours}:${minutes}:${seconds}`;
+}
+
+const isTimer = () => {
+  if (!localStorage.getItem('timerHeader') || !localStorage.getItem('timerDate')) {
+    return;
+  }
+  title.textContent = localStorage.getItem('timerHeader');
+  targetDate = localStorage.getItem('timerDate');
+
+  toggleHide();
+  countdown();
+
+  intervalId = setInterval(countdown, 1000);
+
+  resetBtn.addEventListener('click', reserTimer, { once: true });
 }
 
 const startTimer = () => {
@@ -90,6 +105,9 @@ const startTimer = () => {
   title.textContent = timerHeader.value;
   targetDate = userDate.value;
 
+  localStorage.setItem('timerHeader', timerHeader.value);
+  localStorage.setItem('timerDate', userDate.value);
+
   countdown();
 
   intervalId = setInterval(countdown, 1000);
@@ -97,6 +115,9 @@ const startTimer = () => {
 
 const reserTimer = () => {
   clearInterval(intervalId);
+  localStorage.removeItem('timerHeader');
+  localStorage.removeItem('timerDate');
+
   toggleHide();
 
   title.textContent = 'Создать новый таймер обратного отсчета';
@@ -104,4 +125,5 @@ const reserTimer = () => {
   userDate.value = '';
 }
 
-startBtn.addEventListener('click', startTimer)
+isTimer();
+startBtn.addEventListener('click', startTimer);
