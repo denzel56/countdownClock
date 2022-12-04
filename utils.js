@@ -5,5 +5,7 @@ export const addZero = (num) => {
 }
 
 export const toggleHide = (elem) => {
-  elem.classList.toggle('hide');
+  elem.forEach(item => {
+    item.classList.toggle('hide');
+  });
 }

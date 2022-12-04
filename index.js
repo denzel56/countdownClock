@@ -1,20 +1,4 @@
 'use strict'
-/*
-  - Получаем input`ы и сохраняем в переменные.
-  - На кнопку добавляем слушатель события клик.
-  - По клику на кнопку записываем в переменные (name, endDate) значения полученные от пользователя.
-    Меняем заголовок на name.
-    Скрываем инпуты, показываем таймер и кнопку сброса тамера.
-  - В функции Получаем текущую дату и запиываем в переменную.
-    Вычитаем из endDate текущую дату и результат запиываем в переменную timeLeft.
-  - Запускаем setInterval и каждую 1 секунду уменьшаем timeLeft на 1.
-
-  - На кнопку сброса добавляем слушатель события клик.
-  - По клику на кнопку делаем removeInterval.
-    Меняем заголовок на "Создать новый таймер обратного отсчета".
-    Скрываем таймер и кнопку сброса тамера, показываем поля ввода.
-    Обнуляем timeLeft.
-*/
 
 import { addZero, toggleHide } from "./utils.js";
 
@@ -37,29 +21,29 @@ class Timer {
     this.targetDate = null;
   }
 
-  today() {
+  getToday() {
     return new Date();
   }
 
-  deadline(date) {
+  formatDeadline(date) {
     return new Date(date.split('-'));
   }
 
-  diff() {
-    return this.deadline(this.targetDate) - this.today();
+  getDiff() {
+    return this.formatDeadline(this.targetDate) - this.getToday();
   }
 
-  days() {
-    return addZero(parseInt(this.diff() / (1000 * 60 * 60 * 24)));
+  getDays() {
+    return addZero(parseInt(this.getDiff() / (1000 * 60 * 60 * 24)));
   }
-  hours() {
-    return addZero(parseInt((this.diff() / (1000 * 60 * 60)) % 24));
+  getHours() {
+    return addZero(parseInt((this.getDiff() / (1000 * 60 * 60)) % 24));
   }
-  minutes() {
-    return addZero(parseInt((this.diff() / (1000 * 60)) % 60));
+  getMinutes() {
+    return addZero(parseInt((this.getDiff() / (1000 * 60)) % 60));
   }
-  seconds() {
-    return addZero(parseInt((this.diff() / 1000) % 60));
+  getSeconds() {
+    return addZero(parseInt((this.getDiff() / 1000) % 60));
   }
 
   isTimer = () => {
@@ -69,10 +53,7 @@ class Timer {
     title.textContent = localStorage.getItem('timerHeader');
     this.targetDate = localStorage.getItem('timerDate');
 
-    toggleHide(inputBlock);
-    toggleHide(outputBlock);
-    toggleHide(startBtn);
-    toggleHide(resetBtn);
+    toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
 
     countdown();
 
@@ -84,12 +65,12 @@ class Timer {
 const myTimer = new Timer();
 
 function countdown() {
-  if (myTimer.diff() <= 0) {
+  if (myTimer.getDiff() <= 0) {
     clearInterval(intervalId);
     numbers.textContent = '0:0:0:0';
   }
 
-  numbers.textContent = `${myTimer.days()}:${myTimer.hours()}:${myTimer.minutes()}:${myTimer.seconds()}`;
+  numbers.textContent = `${myTimer.getDays()}:${myTimer.getHours()}:${myTimer.getMinutes()}:${myTimer.getSeconds()}`;
 }
 
 const startTimer = () => {
@@ -105,15 +86,12 @@ const startTimer = () => {
     return;
   }
 
-  if (myTimer.deadline(userDate.value) < myTimer.today) {
+  if (myTimer.formatDeadline(userDate.value) < myTimer.today) {
     alert('Укажите дату больше, чем сегодня');
     return;
   }
 
-  toggleHide(inputBlock);
-  toggleHide(outputBlock);
-  toggleHide(startBtn);
-  toggleHide(resetBtn);
+  toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
 
   resetBtn.addEventListener('click', resetTimer, { once: true });
 
@@ -133,10 +111,7 @@ const resetTimer = () => {
   localStorage.removeItem('timerHeader');
   localStorage.removeItem('timerDate');
 
-  toggleHide(inputBlock);
-  toggleHide(outputBlock);
-  toggleHide(startBtn);
-  toggleHide(resetBtn);
+  toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
 
   title.textContent = 'Создать новый таймер обратного отсчета';
   timerHeader.value = '';
