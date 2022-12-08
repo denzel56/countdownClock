@@ -14,11 +14,12 @@ const timerHeader = document.querySelector('#title-date');
 const userDate = document.querySelector('#date');
 const numbers = document.querySelector('.numbers');
 
-let intervalId = null;
+let timer;
 
 class Timer {
-  constructor() {
-    this.targetDate = null;
+  constructor(date) {
+    this.targetDate = date;
+    this.intervalId = null;
   }
 
   getToday() {
@@ -46,48 +47,64 @@ class Timer {
     return addZero(parseInt((this.getDiff() / 1000) % 60));
   }
 
-  isTimer = () => {
-    if (!localStorage.getItem('timerHeader') || !localStorage.getItem('timerDate')) {
-      return;
+  checkValues() {
+    if (timerHeader.value === '') {
+      alert('Введите заголовок');
+      return false;
     }
-    title.textContent = localStorage.getItem('timerHeader');
-    this.targetDate = localStorage.getItem('timerDate');
 
-    toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
+    if (userDate.value === '') {
+      alert('Укажите дату окончания отсчета');
+      return false;
+    }
 
-    countdown();
+    if (this.formatDeadline(userDate.value) < this.getToday()) {
+      alert('Укажите дату больше, чем сегодня');
+      return false;
+    }
 
-    intervalId = setInterval(countdown, 1000);
-    resetBtn.addEventListener('click', resetTimer, { once: true });
+    return true;
+  }
+
+  countdown() {
+    if (this.getDiff() <= 0) {
+      clearInterval(intervalId);
+      numbers.textContent = '0:0:0:0';
+    }
+
+    numbers.textContent = `${this.getDays()}:${this.getHours()}:${this.getMinutes()}:${this.getSeconds()}`;
+  }
+
+  clearInterval() {
+    clearInterval(this.intervalId);
   }
 }
 
-const myTimer = new Timer();
 
-function countdown() {
-  if (myTimer.getDiff() <= 0) {
-    clearInterval(intervalId);
-    numbers.textContent = '0:0:0:0';
+const isTimer = () => {
+  const storageDate = localStorage.getItem('timerDate');
+  const storageTitle = localStorage.getItem('timerHeader');
+
+  if (!storageTitle || !storageDate) {
+    return;
   }
 
-  numbers.textContent = `${myTimer.getDays()}:${myTimer.getHours()}:${myTimer.getMinutes()}:${myTimer.getSeconds()}`;
+  timer = new Timer(storageDate);
+  title.textContent = storageTitle;
+
+  toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
+
+  timer.countdown();
+
+  timer.intervalId = setInterval(timer.countdown.bind(timer), 1000);
+  resetBtn.addEventListener('click', resetTimer, { once: true });
 }
+
 
 const startTimer = () => {
-  if (timerHeader.value === '') {
-    alert('Введите заголовок');
+  timer = new Timer(userDate.value);
 
-    return;
-  }
-
-  if (userDate.value === '') {
-    alert('Укажите дату окончания отсчета');
-
-    return;
-  }
-
-  if (myTimer.formatDeadline(userDate.value) < myTimer.today) {
-    alert('Укажите дату больше, чем сегодня');
+  if (!timer.checkValues()) {
     return;
   }
 
@@ -95,19 +112,18 @@ const startTimer = () => {
 
   resetBtn.addEventListener('click', resetTimer, { once: true });
 
-  title.textContent = timerHeader.value;
-  myTimer.targetDate = userDate.value;
+  title.textContent = timerHeader.value; timer.targetDate = userDate.value;
 
   localStorage.setItem('timerHeader', timerHeader.value);
   localStorage.setItem('timerDate', userDate.value);
 
-  countdown();
-
-  intervalId = setInterval(countdown, 1000);
+  timer.countdown();
+  timer.intervalId = setInterval(timer.countdown.bind(timer), 1000);
 }
 
+
 const resetTimer = () => {
-  clearInterval(intervalId);
+  timer.clearInterval();
   localStorage.removeItem('timerHeader');
   localStorage.removeItem('timerDate');
 
@@ -118,5 +134,6 @@ const resetTimer = () => {
   userDate.value = '';
 }
 
-myTimer.isTimer();
+
+isTimer();
 startBtn.addEventListener('click', startTimer);
