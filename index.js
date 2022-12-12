@@ -1,20 +1,7 @@
 'use strict'
-/*
-  - Получаем input`ы и сохраняем в переменные.
-  - На кнопку добавляем слушатель события клик.
-  - По клику на кнопку записываем в переменные (name, endDate) значения полученные от пользователя.
-    Меняем заголовок на name.
-    Скрываем инпуты, показываем таймер и кнопку сброса тамера.
-  - В функции Получаем текущую дату и запиываем в переменную.
-    Вычитаем из endDate текущую дату и результат запиываем в переменную timeLeft.
-  - Запускаем setInterval и каждую 1 секунду уменьшаем timeLeft на 1.
 
-  - На кнопку сброса добавляем слушатель события клик.
-  - По клику на кнопку делаем removeInterval.
-    Меняем заголовок на "Создать новый таймер обратного отсчета".
-    Скрываем таймер и кнопку сброса тамера, показываем поля ввода.
-    Обнуляем timeLeft.
-*/
+import { addZero, toggleHide } from "./utils.js";
+
 const startBtn = document.querySelector('#btn');
 const resetBtn = document.querySelector('#btn-reset');
 
@@ -27,103 +14,126 @@ const timerHeader = document.querySelector('#title-date');
 const userDate = document.querySelector('#date');
 const numbers = document.querySelector('.numbers');
 
-let targetDate = null;
-let intervalId = null;
+let timer;
 
-const toggleHide = () => {
-  inputBlock.classList.toggle('hide');
-  outputBlock.classList.toggle('hide');
-
-  startBtn.classList.toggle('hide');
-  resetBtn.classList.toggle('hide');
-}
-
-const addZero = (num) => {
-  return num < 10 && num > 0 ? `0${num}` : num;
-}
-
-const countdown = () => {
-  const deadline = new Date(targetDate.split('-'));
-  const today = new Date();
-  const diff = deadline - today;
-
-  if (diff <= 0) {
-    clearInterval(intervalId);
-
-    numbers.textContent = '0:0:0:0';
+class Timer {
+  constructor(date) {
+    this.targetDate = date;
+    this.intervalId = null;
   }
 
-  const days = addZero(parseInt(diff / (1000 * 60 * 60 * 24)));
-  const hours = addZero(parseInt((diff / (1000 * 60 * 60)) % 24));
-  const minutes = addZero(parseInt((diff / (1000 * 60)) % 60));
-  const seconds = addZero(parseInt((diff / 1000) % 60));
+  getToday() {
+    return new Date();
+  }
 
-  numbers.textContent = `${days}:${hours}:${minutes}:${seconds}`;
+  formatDeadline(date) {
+    return new Date(date.split('-'));
+  }
+
+  getDiff() {
+    return this.formatDeadline(this.targetDate) - this.getToday();
+  }
+
+  getDays() {
+    return addZero(parseInt(this.getDiff() / (1000 * 60 * 60 * 24)));
+  }
+  getHours() {
+    return addZero(parseInt((this.getDiff() / (1000 * 60 * 60)) % 24));
+  }
+  getMinutes() {
+    return addZero(parseInt((this.getDiff() / (1000 * 60)) % 60));
+  }
+  getSeconds() {
+    return addZero(parseInt((this.getDiff() / 1000) % 60));
+  }
+
+  checkValues() {
+    if (timerHeader.value === '') {
+      alert('Введите заголовок');
+      return false;
+    }
+
+    if (userDate.value === '') {
+      alert('Укажите дату окончания отсчета');
+      return false;
+    }
+
+    if (this.formatDeadline(userDate.value) < this.getToday()) {
+      alert('Укажите дату больше, чем сегодня');
+      return false;
+    }
+
+    return true;
+  }
+
+  countdown() {
+    if (this.getDiff() <= 0) {
+      clearInterval(intervalId);
+      numbers.textContent = '0:0:0:0';
+    }
+
+    numbers.textContent = `${this.getDays()}:${this.getHours()}:${this.getMinutes()}:${this.getSeconds()}`;
+  }
+
+  clearInterval() {
+    clearInterval(this.intervalId);
+  }
 }
+
 
 const isTimer = () => {
-  if (!localStorage.getItem('timerHeader') || !localStorage.getItem('timerDate')) {
+  const storageDate = localStorage.getItem('timerDate');
+  const storageTitle = localStorage.getItem('timerHeader');
+
+  if (!storageTitle || !storageDate) {
     return;
   }
-  title.textContent = localStorage.getItem('timerHeader');
-  targetDate = localStorage.getItem('timerDate');
 
-  toggleHide();
-  countdown();
+  timer = new Timer(storageDate);
+  title.textContent = storageTitle;
 
-  intervalId = setInterval(countdown, 1000);
+  toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
 
-  resetBtn.addEventListener('click', reserTimer, { once: true });
+  timer.countdown();
+
+  timer.intervalId = setInterval(timer.countdown.bind(timer), 1000);
+  resetBtn.addEventListener('click', resetTimer, { once: true });
 }
 
+
 const startTimer = () => {
+  timer = new Timer(userDate.value);
 
-  if (timerHeader.value === '') {
-    alert('Введите заголовок');
-
+  if (!timer.checkValues()) {
     return;
   }
 
-  if (userDate.value === '') {
-    alert('Укажите дату окончания отсчета');
+  toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
 
-    return;
-  }
+  resetBtn.addEventListener('click', resetTimer, { once: true });
 
-  const deadline = new Date(userDate.value.split('-'));
-
-  if (deadline < new Date()) {
-    alert('Укажите дату больше, чем сегодня');
-
-    return;
-  }
-
-  toggleHide();
-
-  resetBtn.addEventListener('click', reserTimer, { once: true });
-
-  title.textContent = timerHeader.value;
-  targetDate = userDate.value;
+  title.textContent = timerHeader.value; timer.targetDate = userDate.value;
 
   localStorage.setItem('timerHeader', timerHeader.value);
   localStorage.setItem('timerDate', userDate.value);
 
-  countdown();
-
-  intervalId = setInterval(countdown, 1000);
+  timer.countdown();
+  timer.intervalId = setInterval(timer.countdown.bind(timer), 1000);
 }
 
-const reserTimer = () => {
-  clearInterval(intervalId);
+
+const resetTimer = () => {
+  timer.clearInterval();
   localStorage.removeItem('timerHeader');
   localStorage.removeItem('timerDate');
 
-  toggleHide();
+  toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
 
   title.textContent = 'Создать новый таймер обратного отсчета';
   timerHeader.value = '';
   userDate.value = '';
 }
+
 
 isTimer();
 startBtn.addEventListener('click', startTimer);
