@@ -1,8 +1,6 @@
-'use strict'
-
 import './style.css';
 
-import { addZero, toggleHide } from "./utils.js";
+import { addZero, toggleHide } from './utils';
 
 const startBtn = document.querySelector('#btn');
 const resetBtn = document.querySelector('#btn-reset');
@@ -22,14 +20,18 @@ class Timer {
   constructor(date) {
     this.targetDate = date;
     this.intervalId = null;
+    this.today = null;
+    this.deadline = null;
   }
 
   getToday() {
-    return new Date();
+    this.today = new Date();
+    return this.today;
   }
 
   formatDeadline(date) {
-    return new Date(date.split('-'));
+    this.deadline = new Date(date.split('-'));
+    return this.deadline;
   }
 
   getDiff() {
@@ -37,16 +39,20 @@ class Timer {
   }
 
   getDays() {
-    return addZero(parseInt(this.getDiff() / (1000 * 60 * 60 * 24)));
+    // console.log(addZero(parseInt(this.getDiff() / (1000 * 60 * 60 * 24))));
+    return addZero(parseInt(this.getDiff() / (1000 * 60 * 60 * 24), 10));
   }
+
   getHours() {
-    return addZero(parseInt((this.getDiff() / (1000 * 60 * 60)) % 24));
+    return addZero(parseInt(((this.getDiff() / (1000 * 60 * 60)) % 24), 10));
   }
+
   getMinutes() {
-    return addZero(parseInt((this.getDiff() / (1000 * 60)) % 60));
+    return addZero(parseInt(((this.getDiff() / (1000 * 60)) % 60), 10));
   }
+
   getSeconds() {
-    return addZero(parseInt((this.getDiff() / 1000) % 60));
+    return addZero(parseInt(((this.getDiff() / 1000) % 60), 10));
   }
 
   checkValues() {
@@ -70,7 +76,7 @@ class Timer {
 
   countdown() {
     if (this.getDiff() <= 0) {
-      clearInterval(intervalId);
+      clearInterval(this.intervalId);
       numbers.textContent = '0:0:0:0';
     }
 
@@ -82,6 +88,17 @@ class Timer {
   }
 }
 
+const resetTimer = () => {
+  timer.clearInterval();
+  localStorage.removeItem('timerHeader');
+  localStorage.removeItem('timerDate');
+
+  toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
+
+  title.textContent = 'Создать новый таймер обратного отсчета';
+  timerHeader.value = '';
+  userDate.value = '';
+};
 
 const isTimer = () => {
   const storageDate = localStorage.getItem('timerDate');
@@ -100,8 +117,7 @@ const isTimer = () => {
 
   timer.intervalId = setInterval(timer.countdown.bind(timer), 1000);
   resetBtn.addEventListener('click', resetTimer, { once: true });
-}
-
+};
 
 const startTimer = () => {
   timer = new Timer(userDate.value);
@@ -121,21 +137,7 @@ const startTimer = () => {
 
   timer.countdown();
   timer.intervalId = setInterval(timer.countdown.bind(timer), 1000);
-}
-
-
-const resetTimer = () => {
-  timer.clearInterval();
-  localStorage.removeItem('timerHeader');
-  localStorage.removeItem('timerDate');
-
-  toggleHide([inputBlock, outputBlock, startBtn, resetBtn]);
-
-  title.textContent = 'Создать новый таймер обратного отсчета';
-  timerHeader.value = '';
-  userDate.value = '';
-}
-
+};
 
 isTimer();
 startBtn.addEventListener('click', startTimer);
